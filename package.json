@@ -1,0 +1,37 @@
+{
+  "name": "hubot-auth-middleware",
+  "description": "Use roles, rooms, and envs to restrict command access in other scripts",
+  "version": "0.1.0",
+  "author": "Nicholas Whittier <nicholas@hellosign.com>",
+  "contributors": [
+  ],
+  "license": "MIT",
+  "keywords": [
+    "hubot",
+    "middleware",
+    "authentication",
+    "roles",
+    "environments"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/HelloFax/hubot-auth-middleware.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HelloFax/hubot-auth-middleware/issues"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "hubot": "2.x",
+    "hubot-auth": ">=1.x",
+    "hubot-mock-adapter": "1.0.0",
+    "coffee-script": "1.6.3",
+    "chai": "3.5.0",
+    "mocha": "2.4.5"
+  },
+  "scripts":{
+    "test": "mocha --compilers coffee:coffee-script"
+  },
+  "main": "index.coffee"
+}
