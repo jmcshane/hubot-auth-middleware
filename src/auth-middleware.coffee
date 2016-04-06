@@ -57,7 +57,7 @@ module.exports = (robot) ->
 
     if opts.auth is "true" 
       if opts.env not in [ undefined, authMiddlewareEnv ]
-        action = 'Rejecting'
+        action = 'Rejecting (env)'
         # By default, don't respond in this case. Env quarantining supports multiple hubots,
         # we want the instance to skip the task, but not clutter the chat room. Env var override available.
         if environmentReply
@@ -65,18 +65,18 @@ module.exports = (robot) ->
         else
           context.response.message.finish()
       if opts.room not in [ undefined, reqRoom ]
-        action = 'Rejecting'
+        action = 'Rejecting (room)'
         authFail context, "#{action} '#{reqUser.name}: #{reqMsg}' -- use this room: #{opts.room}"
       if opts.role != undefined
         if robot.auth.hasRole(reqUser, opts.role) is false
-          action = 'Rejecting'
+          action = 'Rejecting (role)'
           authFail context, "#{action} '#{reqUser.name}: #{reqMsg}' -- only allowed by users in role: #{opts.role}"
 
       # TODO - add a confirmation require w/ timeout? 
       # Spit out a code and the users in a role, and if someone responds with
       # the code write a flag to redis. Periodically check the flag in the timout?
 
-      robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from #{reqUser.name} (#{reqUser.id}) in #{reqRoom}"
+      robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
 
       if action == 'Accepting'
         next()
@@ -85,16 +85,16 @@ module.exports = (robot) ->
 
     else if ignoreNoAuth
       # Ignore any requests with no listener.options.auth setting
-      action = 'Skipping'
+      action = 'Rejecting (ignore_no_auth)'
       context.response.message.finish()
 
-      robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from #{reqUser.name} (#{reqUser.id}) in #{reqRoom}"
+      robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
 
       done()
     else 
       # Auth isn't configured, and the ignore no auth flag isn't set: proceed
       action = 'Accepting (without auth checks)'
-      robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from #{reqUser.name} (#{reqUser.id}) in #{reqRoom}"
+      robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
 
       next()
 
