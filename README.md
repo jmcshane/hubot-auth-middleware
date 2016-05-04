@@ -97,8 +97,18 @@ hubot-auth-middleware writes event details to INFO logs for audit needs. Message
 
 #### Example log:
 
+These are the log outputs from the test suite. Note that I removed the timestamps for human-readability and to focus on the actual log message. Also, by default these are not displayed during testing (HUBOT_LOG_LEVEL='warning').
+
 ````
-INFO auth-middleware: Rejecting (ignore_no_auth) 'ship it' request from user: Nicholas Whittier (123456), room: test, env: production
+INFO auth-middleware: Accepting (without auth checks) 'amTest no options' request from user: adminUser (1), room: #test, env: x
+INFO auth-middleware: Accepting (without auth checks) 'amTest strange options' request from user: adminUser (1), room: #test, env: x
+INFO auth-middleware: Rejecting (env) 'amTest reject environment' request from user: adminUser (1), room: #test, env: x
+INFO auth-middleware: Rejecting (room) 'amTest reject room' request from user: adminUser (1), room: #test, env: x
+INFO auth-middleware: Rejecting (role) 'amTest reject role' request from user: adminUser (1), room: #test, env: x
+INFO auth-middleware: Accepting (valid auth) 'amTest allow environment' request from user: adminUser (1), room: #test, env: x
+INFO auth-middleware: Accepting (valid auth) 'amTest allow room' request from user: otherUser (2), room: #x, env: x
+INFO auth-middleware: Accepting (valid auth) 'amTest allow role' request from user: adminUser (1), room: #test, env: x
+
 ````
 
 ## Testing
