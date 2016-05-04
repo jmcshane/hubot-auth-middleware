@@ -38,6 +38,7 @@
 # Commands:
 #
 logPrefix         = 'auth-middleware'
+successAction     = 'Accepting (valid auth)'
 ignoreNoAuth      = process.env.HUBOT_AUTH_MIDDLEWARE_IGNORE_NO_AUTH or false
 authMiddlewareEnv = process.env.HUBOT_AUTH_MIDDLEWARE_ENVIRONMENT or 'production'
 environmentReply  = process.env.HUBOT_AUTH_MIDDLEWARE_ENVIRONMENT_REPLY or false
@@ -53,7 +54,7 @@ module.exports = (robot) ->
     reqUser = context.response.message.user
     reqRoom = context.response.message.room
     reqMsg  = context.response.message.text
-    action            = 'Accepting'
+    action  = successAction
 
     if opts.auth is "true" 
       if opts.env not in [ undefined, authMiddlewareEnv ]
@@ -78,7 +79,7 @@ module.exports = (robot) ->
 
       robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
 
-      if action == 'Accepting'
+      if action == successAction
         next()
       else
         done()
