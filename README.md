@@ -98,7 +98,7 @@ hubot-auth-middleware writes event details to INFO logs for audit needs. Message
 #### Example log:
 
 ````
-INFO auth-middleware: Rejecting (ignore_no_auth) 'ship it' request from user: Nicholas Whittier (186753), room: test, env: production
+INFO auth-middleware: Rejecting (ignore_no_auth) 'ship it' request from user: Nicholas Whittier (123456), room: test, env: production
 ````
 
 ## Testing
