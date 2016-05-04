@@ -89,7 +89,7 @@ Room quarantines are helpful for lots of circumstances. Using auth-middleware ro
 hubot-auth-middleware writes event details to INFO logs for audit needs. Messages include the following:
  - 'auth-middleware' tag
  - action (accepting|rejecting)
- - action reason (when appropriate - wrong room, wrong environment, etc.)
+ - action reason (valid auth, wrong room, wrong environment, etc.)
  - request command
  - user and user id making the request
  - room where the request was made
@@ -108,7 +108,6 @@ INFO auth-middleware: Rejecting (role) 'amTest reject role' request from user: a
 INFO auth-middleware: Accepting (valid auth) 'amTest allow environment' request from user: adminUser (1), room: #test, env: x
 INFO auth-middleware: Accepting (valid auth) 'amTest allow room' request from user: otherUser (2), room: #x, env: x
 INFO auth-middleware: Accepting (valid auth) 'amTest allow role' request from user: adminUser (1), room: #test, env: x
-
 ````
 
 ## Testing
