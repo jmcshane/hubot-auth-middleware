@@ -24,7 +24,8 @@ Add the hubot-auth-middleware package to hubot/package.json dependencies and hub
 Hubot-auth-middleware supports environment variables:
 
   - HUBOT_AUTH_MIDDLEWARE_ENVIRONMENT - sets an environment that hubot-auth-middleware uses to confirm env-specific controls, defaults to 'production'
-  - HUBOT_AUTH_MIDDLEWARE_IGNORE_NO_AUTH - if true the given hubot instance will ignore any listeners where the listener.option.auth attribute is not "true".
+  - HUBOT_AUTH_MIDDLEWARE_IGNORE_NO_AUTH - if true the given hubot instance will ignore any listeners where the listener.option.auth attribute is not "true"
+  - HUBOT_AUTH_MIDDLEWARE_ENVIRONMENT_REPLY - if true the instance will send a response message for environment rejections
 
 
 ## Quick Start
@@ -83,9 +84,26 @@ Room quarantines are helpful for lots of circumstances. Using auth-middleware ro
     msg.send videolink
 ````
 
+### Audits and Logging
+
+hubot-auth-middleware writes event details to INFO logs for audit needs. Messages include the following:
+ - 'auth-middleware' tag
+ - action (accepting|rejecting)
+ - action reason (when appropriate - wrong room, wrong environment, etc.)
+ - request command
+ - user and user id making the request
+ - room where the request was made
+ - environment of the given Hubot instance
+
+#### Example log:
+
+````
+INFO auth-middleware: Rejecting (ignore_no_auth) 'ship it' request from user: Nicholas Whittier (186753), room: test, env: production
+````
+
 ## Testing
 
-Test utilities are listed as devDependencies, and nvm is in place for nodejs version management. If you want to run tests or make updates, use:
+Test utilities are listed as devDependencies, and [nvm](https://github.com/creationix/nvm) is in place for nodejs version management. If you want to run tests or make updates, use:
 
 ````
 nvm use
