@@ -7,10 +7,14 @@
 #     - rooms
 #     - hubot-auth-middleware environments
 #
-#   Setting the HUBOT_AUTH_IGNORE_NO_AUTH environment variable to true makes
-#   hubot skip listener-middleware checks for any listener without a 
+#   Setting the HUBOT_AUTH_MIDDLEWARE_IGNORE_NO_AUTH environment variable to
+#   true makes hubot skip listener-middleware checks for any listener without a
 #   listener.options.auth = true. This is useful for multi-bot scenarios where
-#   external scripts are in use. 
+#   external scripts are in use. Alternatively, setting the
+#   HUBOT_AUTH_MIDDLEWARE_QUARANTINE_NO_AUTH environment variable to a room
+#   will only respond to non-auth configured listeners in a particular room.
+#   ...IGNORE_NO_AUTH must be false for room quarantining of no-auth listeners
+#   to function.
 #
 #   Listener options should use the following format:
 #     { "id":"someId",
@@ -34,6 +38,7 @@
 #   HUBOT_AUTH_MIDDLEWARE_ENVIRONMENT - defaults to "production"
 #   HUBOT_AUTH_MIDDLEWARE_ENVIRONMENT_REPLY - defaults to false
 #   HUBOT_AUTH_MIDDLEWARE_IGNORE_NO_AUTH - defaults to false
+#   HUBOT_AUTH_MIDDLEWARE_QUARANTINE_NO_AUTH - defaults to ...ENVIRONMENT value
 #
 # Commands:
 #
@@ -42,6 +47,7 @@ successAction     = 'Accepting (valid auth)'
 ignoreNoAuth      = process.env.HUBOT_AUTH_MIDDLEWARE_IGNORE_NO_AUTH or false
 authMiddlewareEnv = process.env.HUBOT_AUTH_MIDDLEWARE_ENVIRONMENT or 'production'
 environmentReply  = process.env.HUBOT_AUTH_MIDDLEWARE_ENVIRONMENT_REPLY or false
+quarantineNoAuth  = process.env.HUBOT_AUTH_MIDDLEWARE_QUARANTINE_NO_AUTH or authMiddlewareEnv
 
 authFail = (context, errorMsg) ->
   context.response.reply errorMsg
@@ -89,7 +95,7 @@ module.exports = (robot) ->
       else
         done()
 
-    else if ignoreNoAuth
+    else if ignoreNoAuth != 'false'
       # Ignore any requests with no listener.options.auth setting
       action = 'Rejecting (ignore_no_auth)'
       context.response.message.finish()
@@ -97,8 +103,16 @@ module.exports = (robot) ->
       robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
 
       done()
-    else 
-      # Auth isn't configured, and the ignore no auth flag isn't set: proceed
+    else if quarantineNoAuth != reqRoom
+      # Ignore any requests with no listener.options.auth setting from outside the quarantine room
+      action = 'Rejecting (quarantine_no_auth)'
+      context.response.message.finish()
+
+      robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
+
+      done()
+    else
+      # Auth isn't configured, and either the ignore no auth flag isn't set or we are in the quarantine room: proceed
       action = 'Accepting (without auth checks)'
       robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
 
