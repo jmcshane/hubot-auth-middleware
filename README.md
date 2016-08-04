@@ -3,7 +3,7 @@ Hubot-auth-middleware adds listener middleware for restricting command access. R
 The core implementation uses listener options attributes that are processed in the auth-middleware's listenerMiddlware. You can create access-controled commands using formats like:
 
 ````
-  listenerOptions = {"id":"makeSandwich","auth":"true","role":"sudoers"}
+  listenerOptions = {"id":"makeSandwich","auth":"true","roles":"sudoers"}
 
   robot.hear /make me a sandwich/, listenerOptions, (msg) ->
     msg.send "you are a sandwich"
@@ -11,8 +11,14 @@ The core implementation uses listener options attributes that are processed in t
 
 If the request comes from a user who does not have the `sudoers` role, an error notification is logged and replied.
 
-The various access control types can be combined as necessary.
-
+The various access control types can be combined as necessary. The `roles` and `rooms` values can be strings or arrays, so these all work:
+````
+  listenerOptionsX = {"id":"secretStuff","auth":"true","roles":["sudoers","admin","wheel"],"rooms":"#situation"}
+  ...
+  listenerOptionsY = {"id":"reallySecretStuff","auth":"true","roles":"chiefs","rooms":["#panic","#emergency"]}
+  ...
+  listenerOptionsZ = {"id":"justForClarity","auth":"true","roles":["admin"],"rooms":"#panic"}
+````
 
 ## Installation
 
@@ -34,7 +40,7 @@ You will need a recent Hubot version (supporting middleware). If middleware supp
 
 ````
 ...
-+    listenerOptions = {"id":"someCommand","auth":"true","role":"admins"}
++    listenerOptions = {"id":"someCommand","auth":"true","roles":"admins"}
 -    robot.hear /some command/, (msg) ->
 +    robot.hear /some command/, listenerOptions, (msg) ->  
        # does some stuff
@@ -61,7 +67,7 @@ In some organizations multiple chatbots serving multiple environments (data cent
 Custom roles support basic access control groups. If deploy, infrastructure, or other commands must be limited to particular users, assign all those users a role and declare that role as required for a given command listener.
 
 ````
-  listenerOptions = {"id":"deleteUser","auth":"true","role":"mgmt"}
+  listenerOptions = {"id":"deleteUser","auth":"true","roles":"mgmt"}
   
   robot.hear /userDelete ([\w]+)/, listenerOptions, (msg) ->
     # Errors if request.user is not in role mgmt
@@ -75,7 +81,7 @@ Custom roles support basic access control groups. If deploy, infrastructure, or 
 Room quarantines are helpful for lots of circumstances. Using auth-middleware room controls lets multiple bots listen wherever they want, but only respond to room-specific requests. For some bot-user/adapter configurations this is much easier than per-room quarantining at the adapter/user level.
 
 ````
-  listenerOptions = {"id":"youtubeSearches","auth":"true","room":"videosRoom"}
+  listenerOptions = {"id":"youtubeSearches","auth":"true","rooms":"videosRoom"}
 
   robot.hear /youtube me (.*)/, listenerOptions, (msg) ->
     # Errors if the request is anywhere other than the 'videosRoom'

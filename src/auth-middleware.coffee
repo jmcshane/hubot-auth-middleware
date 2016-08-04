@@ -15,8 +15,8 @@
 #   Listener options should use the following format:
 #     { "id":"someId",
 #       "auth":"true",
-#       "room":"roomId",
-#       "role":"roleName",
+#       "rooms":["roomId1","roomId2"],
+#       "roles":["roleName1", "roleName2"],
 #       "env":"authMiddlewareEnv"
 #     }
 #  
@@ -56,6 +56,10 @@ module.exports = (robot) ->
     reqMsg  = context.response.message.text
     action  = successAction
 
+    # Default to arrays so listeners can pass a single string
+    opts.roles = [opts.roles] if typeof opts.roles is 'string'
+    opts.rooms = [opts.rooms] if typeof opts.rooms is 'string'
+
     if opts.auth is "true" 
       if opts.env not in [ undefined, authMiddlewareEnv ]
         action = 'Rejecting (env)'
@@ -65,13 +69,14 @@ module.exports = (robot) ->
           authFail context, "#{action} '#{reqUser.name}: #{reqMsg}' -- not executing from this env (hubot instance: #{opts.env})"
         else
           context.response.message.finish()
-      if opts.room not in [ undefined, reqRoom ]
-        action = 'Rejecting (room)'
-        authFail context, "#{action} '#{reqUser.name}: #{reqMsg}' -- use this room: #{opts.room}"
-      if opts.role != undefined
-        if robot.auth.hasRole(reqUser, opts.role) is false
+      if opts.rooms != undefined 
+        if reqRoom not in opts.rooms
+          action = 'Rejecting (room)'
+          authFail context, "#{action} '#{reqUser.name}: #{reqMsg}' -- use this room: #{opts.room}"
+      if opts.roles != undefined
+        if robot.auth.hasRole(reqUser, opts.roles) is false
           action = 'Rejecting (role)'
-          authFail context, "#{action} '#{reqUser.name}: #{reqMsg}' -- only allowed by users in role: #{opts.role}"
+          authFail context, "#{action} '#{reqUser.name}: #{reqMsg}' -- only allowed by users in role(s): #{opts.roles}"
 
       # TODO - add a confirmation require w/ timeout? 
       # Spit out a code and the users in a role, and if someone responds with
