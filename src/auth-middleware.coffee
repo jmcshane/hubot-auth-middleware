@@ -38,7 +38,7 @@
 #   HUBOT_AUTH_MIDDLEWARE_ENVIRONMENT - defaults to "production"
 #   HUBOT_AUTH_MIDDLEWARE_ENVIRONMENT_REPLY - defaults to false
 #   HUBOT_AUTH_MIDDLEWARE_IGNORE_NO_AUTH - defaults to false
-#   HUBOT_AUTH_MIDDLEWARE_QUARANTINE_NO_AUTH - defaults to ...ENVIRONMENT value
+#   HUBOT_AUTH_MIDDLEWARE_QUARANTINE_NO_AUTH - no default, undefined is disabled.
 #
 # Commands:
 #
@@ -47,7 +47,7 @@ successAction     = 'Accepting (valid auth)'
 ignoreNoAuth      = process.env.HUBOT_AUTH_MIDDLEWARE_IGNORE_NO_AUTH or false
 authMiddlewareEnv = process.env.HUBOT_AUTH_MIDDLEWARE_ENVIRONMENT or 'production'
 environmentReply  = process.env.HUBOT_AUTH_MIDDLEWARE_ENVIRONMENT_REPLY or false
-quarantineNoAuth  = process.env.HUBOT_AUTH_MIDDLEWARE_QUARANTINE_NO_AUTH or authMiddlewareEnv
+quarantineNoAuth  = process.env.HUBOT_AUTH_MIDDLEWARE_QUARANTINE_NO_AUTH 
 
 authFail = (context, errorMsg) ->
   context.response.reply errorMsg
@@ -95,26 +95,33 @@ module.exports = (robot) ->
       else
         done()
 
-    else if ignoreNoAuth != 'false'
+    else if ignoreNoAuth is "true"
       # Ignore any requests with no listener.options.auth setting
       action = 'Rejecting (ignore_no_auth)'
       context.response.message.finish()
 
       robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
-
       done()
-    else if quarantineNoAuth != reqRoom
-      # Ignore any requests with no listener.options.auth setting from outside the quarantine room
-      action = 'Rejecting (quarantine_no_auth)'
-      context.response.message.finish()
 
-      robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
+    else if quarantineNoAuth
+      if quarantineNoAuth != reqRoom
+        # Ignore any requests with no listener.options.auth setting from outside the quarantine room
+        action = 'Rejecting (quarantine_no_auth)'
+        context.response.message.finish()
 
-      done()
+        robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
+        done()
+      else
+        # Auth isn't configured, quarantine is AND we are in the quarantine room: proceed
+        action = 'Accepting (in quarantine)'
+
+        robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
+        next()
+
     else
-      # Auth isn't configured, and either the ignore no auth flag isn't set or we are in the quarantine room: proceed
+      # Auth isn't configured, and either the ignore no auth flag isn't set
       action = 'Accepting (without auth checks)'
-      robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
 
+      robot.logger.info "#{logPrefix}: #{action} '#{reqMsg}' request from user: #{reqUser.name} (#{reqUser.id}), room: #{reqRoom}, env: #{authMiddlewareEnv}"
       next()
 
