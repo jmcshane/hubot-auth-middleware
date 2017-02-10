@@ -1,8 +1,7 @@
 {
-  "name": "hubot-auth-middleware",
+  "name": "hubot-auth-middleware-ext",
   "description": "Use roles, rooms, and envs to restrict command access in other scripts",
-  "version": "0.1.0",
-  "author": "Nicholas Whittier <nicholas@hellosign.com>",
+  "version": "0.0.1",
   "contributors": [
   ],
   "license": "MIT",
@@ -17,10 +16,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/HelloFax/hubot-auth-middleware.git"
+    "url": "git://github.com/jmcshane/hubot-auth-middleware.git"
   },
   "bugs": {
-    "url": "https://github.com/HelloFax/hubot-auth-middleware/issues"
+    "url": "https://github.com/jmcshane/hubot-auth-middleware/issues"
   },
   "dependencies": {
   },
